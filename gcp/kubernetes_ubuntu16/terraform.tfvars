@@ -1,9 +1,0 @@
-project_name		  = "kubernetestrial-173407" # Projectname 
-machine_type 		  = "n1-standard-2"
-region 				  = "us-east1"
-region_zone 		  = "us-east1-c"
-credentials_file_path = "creds/terraform.json" # Make sure you download the credentials for the service account in your project. 
-volsize 			  = 10
-private_key_path	  = "creds/id_rsa"         # Create a public/private key pair.
-public_key_path		  = "creds/id_rsa.pub"
-k8s_token 			  = "cc7f32.605f64101dd8a6c3"

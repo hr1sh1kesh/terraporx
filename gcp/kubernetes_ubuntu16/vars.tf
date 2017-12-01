@@ -2,15 +2,10 @@
 #Project Name - use the project-id for your GCP project
 variable "project_name" { default = "" }
 
-# HostIP for your Master where the ETCD server will be installed
-variable "HostIP" {
-   default = "10.128.0.2"
-} 
-
 # GCP Console: IAM & Admin -> Service Accounts -> Compute Engine Default Service Account -> Create Key 
 variable "credentials_file_path" {
   description = "Path to the JSON file used to describe your account credentials"
-  default     = ""
+  default     = "./creds/terraform.json"
 }
 
 variable "machine_type" {  default = "n1-standard-2" }
@@ -19,7 +14,7 @@ variable "region" {  default = "us-central1" }
 
 variable "region_zone" { default = "us-central1-f" }
 
-variable "prefix" { default = "mypx" }
+variable "prefix" { default = "k8s" }
 
 variable "minion-count" {
   description = "# minions"
@@ -34,12 +29,12 @@ variable "volsize" {
 
 variable "private_key_path" {
   description = "private key path"
-  default = "~/.ssh/id_rsa"
+  default = "./creds/id_rsa"
 }
 
 variable "public_key_path" {
   description = "ssh_key"
-  default = "~/.ssh/id_rsa.pub"
+  default = "./creds/id_rsa.pub"
 }
 
 variable "k8s_version" {

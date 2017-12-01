@@ -1,13 +1,11 @@
-<<<<<<< HEAD
 ## Required to get this to work. 
 
 - Generate a keypair and place it in the creds directory. 
 - Download the `credentials.json` for the service account for your GCP project. Place it in the creds directory. 
 - Update `terraform.tfvars` with your Google project details. 
-=======
 # Portworx-ready cluster for Kubernetes on Google Cloud Platform
 
-This terraform will create a Kubernetes cluster on Google Cloud Platform and start a single node ETCD server on the Master node so that you can then install Portworx as a daemon set.
+This terraform will create a Kubernetes cluster on Google Cloud Platform.
 
 ## Follow these steps
 1) Install terraform
@@ -76,4 +74,3 @@ Global Storage Pool
         Total Used      :  266 MiB
         Total Capacity  :  60 GiB
 ```
->>>>>>> ec3d63a86e7783a9d42898608628f212f04b2724
