@@ -1,3 +1,5 @@
 gcp/kubernetes_ubuntu16/creds/terraform.json
 gcp/kubernetes_ubuntu16/creds/id_rsa
 gcp/kubernetes_ubuntu16/creds/id_rsa.pub
+gcp/kubernetes_ubuntu16/.terraform/plugins/linux_amd64/lock.json
+gcp/kubernetes_ubuntu16/.terraform/plugins/linux_amd64/terraform-provider-google_v1.3.0_x4
