@@ -1,5 +1,5 @@
-## Portworx-ready cluster for Kubernetes on Google Cloud Platform
+## Required to get this to work. 
 
-This should "just work".
-But if it loops on startup with the messages `JWS token not being created in cluster-info ConfigMap`,
-then log on to the master and run the script segment from [this comment](https://github.com/kubernetes/kubeadm/issues/335#issuecomment-312932999)
+- Generate a keypair and place it in the creds directory. 
+- Download the `credentials.json` for the service account for your GCP project. Place it in the creds directory. 
+- Update `terraform.tfvars` with your Google project details. 
