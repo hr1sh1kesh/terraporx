@@ -7,14 +7,14 @@ provider "google" {
 
 resource "google_compute_disk" "px-disk" {
   count = "${var.minion-count}"
-  name = "px-disk-${count.index}"
+  name = "${var.prefix}-px-disk-${count.index}"
   type = "pd-ssd"
   zone = "${var.region_zone}"
   size = "${var.volsize}"
 }
 
 resource "google_compute_disk" "px-master-disk" {
-  name = "px-master-disk"
+  name = "${var.prefix}-px-master-disk"
   type = "pd-ssd"
   zone = "${var.region_zone}"
   size = "${var.volsize}"
@@ -22,16 +22,18 @@ resource "google_compute_disk" "px-master-disk" {
 
 resource "google_compute_instance" "k8s_master" {
 
-  name         = "k8s-master"
+  name         = "${var.prefix}-k8s-master"
   machine_type = "${var.machine_type}"
   zone         = "${var.region_zone}"
 
-  disk {
-    image = "ubuntu-os-cloud/ubuntu-1610-yakkety-v20170619a"
+  boot_disk {
+    initialize_params {
+        image = "ubuntu-1604-xenial-v20170328"
+    }
   }
 
-  disk {
-    disk = "${google_compute_disk.px-master-disk.name}"
+  attached_disk {
+        source      = "${google_compute_disk.px-master-disk.0.self_link}"
   }
 
   network_interface {
@@ -64,16 +66,16 @@ resource "google_compute_instance" "k8s_master" {
         "sudo apt-get -y install docker-ce",
         "sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -",
         "sudo echo \"deb http://apt.kubernetes.io/ kubernetes-xenial main\" | sudo tee /etc/apt/sources.list.d/kubernetes.list",
-        "sudo apt-get update && sudo apt-get install -y kubelet=${var.k8s_version}-00 kubeadm=${var.k8s_version}-00 kubectl=${var.k8s_version}-00 kubernetes-cni vim git",
-        "kubeadm init --kubernetes-version v${var.k8s_version} --apiserver-advertise-address ${self.network_interface.0.address} --pod-network-cidr 10.244.0.0/16 --token ${var.k8s_token}",
-        "kubeadm init --kubernetes-version v${var.k8s_version} --apiserver-advertise-address ${self.network_interface.0.address} --token ${var.k8s_token}",
+        "sudo apt-get update && sudo apt-get install -y kubelet=${var.k8s_version} kubeadm=${var.k8s_version} kubectl=${var.k8s_version} kubernetes-cni vim git",
+        "kubeadm init --kubernetes-version v${var.k8s_init_version} --apiserver-advertise-address ${self.network_interface.0.address} --pod-network-cidr 10.244.0.0/16 --token ${var.k8s_token}",
         "echo \"***** Setting up kubeconfig\"",
         "sudo cp /etc/kubernetes/admin.conf /root",
         "sudo chown $(id -u):$(id -g) /root/admin.conf",
         "echo \"export KUBECONFIG=/root/admin.conf\" >> /root/.bashrc",
         "echo \"alias kc=kubectl\" >> /root/.bashrc",
         "sleep 5",
-        "KUBECONFIG=/root/admin.conf kubectl apply -n kube-system -f \"https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE=10.0.0.0/16\""
+        "KUBECONFIG=/root/admin.conf kubectl apply -n kube-system -f \"https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE=10.0.0.0/16\"",
+        "docker run --net=host -d --name etcd-v3.1.3 --volume=/tmp/etcd-data:/etcd-data quay.io/coreos/etcd:v3.1.3 /usr/local/bin/etcd --name my-etcd-1  --data-dir /etcd-data --listen-client-urls http://0.0.0.0:2479 --advertise-client-urls http://${var.HostIP}:2479 --listen-peer-urls http://0.0.0.0:2480 --initial-advertise-peer-urls http://${var.HostIP}:2480  --initial-cluster my-etcd-1=http://${var.HostIP}:2480  --initial-cluster-token my-etcd-token --initial-cluster-state new --auto-compaction-retention 1"
       ]
     }
 }
@@ -81,21 +83,21 @@ resource "google_compute_instance" "k8s_master" {
 
 
 
-
 resource "google_compute_instance" "k8s_minion" {
   count = "${var.minion-count}"
 
-  name         = "k8s-${count.index}"
+  name         = "${var.prefix}-k8s-${count.index}"
   machine_type = "${var.machine_type}"
   zone         = "${var.region_zone}"
 
-  disk {
-    image = "ubuntu-os-cloud/ubuntu-1610-yakkety-v20170619a"
-    # image = "ubuntu-os-cloud/ubuntu-1404-trusty-v20160602"
+  boot_disk {
+    initialize_params {
+        image = "ubuntu-1604-xenial-v20170328"
+    }
   }
 
-  disk {
-    disk = "${element(google_compute_disk.px-disk.*.name, count.index)}"
+  attached_disk {
+    source      = "${element(google_compute_disk.px-disk.*.self_link, count.index)}"
   }
 
   network_interface {
@@ -128,7 +130,7 @@ resource "google_compute_instance" "k8s_minion" {
         "sudo apt-get -y install docker-ce",
         "sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -",
         "sudo echo \"deb http://apt.kubernetes.io/ kubernetes-xenial main\" | sudo tee /etc/apt/sources.list.d/kubernetes.list",
-        "sudo apt-get update && sudo apt-get install -y kubelet=${var.k8s_version}-00 kubeadm=${var.k8s_version}-00 kubectl=${var.k8s_version}-00 kubernetes-cni vim git",
+        "sudo apt-get update && sudo apt-get install -y kubelet=${var.k8s_version} kubeadm=${var.k8s_version} kubectl=${var.k8s_version} kubernetes-cni vim git",
         "kubeadm join --token ${var.k8s_token} ${google_compute_instance.k8s_master.network_interface.0.address}:6443"
       ]
     }

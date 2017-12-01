@@ -1,0 +1,3 @@
+gcp/kubernetes_ubuntu16/creds/terraform.json
+gcp/kubernetes_ubuntu16/creds/id_rsa
+gcp/kubernetes_ubuntu16/creds/id_rsa.pub
